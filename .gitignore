@@ -1,0 +1,4 @@
+honeyTokens/
+generators/__pycache__/
+tokensnare_db.json
+.env
