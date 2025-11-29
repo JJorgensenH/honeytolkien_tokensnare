@@ -5,6 +5,8 @@ import logging
 import json
 import hashlib
 from pathlib import Path
+from urllib.parse import urlparse
+
 from dotenv import load_dotenv
 
 # Cargar variables de entorno desde .env
@@ -220,11 +222,98 @@ def link_hit(token):
 @app.route("/", methods=['GET'])
 def index():
     """Página de información del servidor."""
-    return jsonify({
-        'service': 'TokenSnare', 
-        'active_tokens': len(tokens_db), 
-        'hits': len(hits_db)
-    })
+    return jsonify(
+        {"service": "TokenSnare", "active_tokens": len(tokens_db), "hits": len(hits_db)}
+    )
+
+
+# ============================================================================
+# Sitio web demo
+# ============================================================================
+@app.route("/website_demo")
+def honeybank():
+    server_url = request.host_url.rstrip("/")
+    return render_template("index.html.j2", server_url=server_url)
+
+
+@app.route("/assets/styles.css")
+def css():
+    server_url = request.host_url.rstrip("/")
+    css = render_template("styles.css.j2", server_url=server_url)
+    response = Response(css, mimetype="text/css")
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
+
+
+@app.route("/assets/honey_logo.svg")
+def logo():
+    # Detectar posible clonación
+    referer = request.headers.get("Referer")
+    current_host = request.host  # Ej: honeybank.com
+
+    if referer:
+        try:
+            parsed_ref = urlparse(referer)
+            ref_host = parsed_ref.netloc  # Ej: h0neybank.com
+
+            if ref_host and ref_host != current_host:
+                token_id = generate_token_id("WEBSITE_CLONE_PROTECION_CSS")
+
+                if token_id not in tokens_db:
+                    tokens_db[token_id] = {
+                        "token": token_id,
+                        "type": "WEB_CLONE",
+                        "description": f"Sitio clonado detectado desde {ref_host}",
+                        "created_at": get_timestamp(),
+                        "hits": 0,
+                        "last_hit": None,
+                    }
+                else:
+                    tokens_db[token_id]["description"] = (
+                        f"Sitio clonado detectado desde {ref_host}"
+                    )
+
+                _register_hit(token_id)
+
+        except Exception as e:
+            log_print(f"Error parseando referer en logo: {e}")
+
+    return send_file("assets/honey_logo.svg", mimetype="image/svg+xml")
+
+
+@app.route("/api/callback", methods=["POST", "OPTIONS"])
+def js_callback():
+    if request.method == "OPTIONS":
+        response = Response("", status=204)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+
+        response.headers["Access-Control-Allow-Headers"] = (
+            "Content-Type, X-Cloned-Domain, X-Cloned-Url, X-Screen-Res"
+        )
+        return response
+
+    token_id = generate_token_id("WEBSITE_CLONE_PROTECTION_JS")
+
+    if token_id not in tokens_db:
+        tokens_db[token_id] = {
+            "token": token_id,
+            "type": "WEB_CLONE_JS",
+            "description": "Sitio web clonado (Reporte JS)",
+            "created_at": get_timestamp(),
+            "hits": 0,
+            "last_hit": None,
+        }
+
+    cloned_domain = request.headers.get("X-Cloned-Domain")
+    if cloned_domain:
+        tokens_db[token_id]["description"] = f"Sitio web clonado en: {cloned_domain}"
+
+    _register_hit(token_id)
+
+    response = jsonify({"status": "ok"})
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    return response
 
 
 # ============================================================================

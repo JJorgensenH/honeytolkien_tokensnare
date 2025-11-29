@@ -3,3 +3,4 @@ requests
 pypdf
 ebooklib
 python-docx
+dotenv

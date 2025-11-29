@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>HoneyBank - Homebanking</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="./assets/styles.css" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="login-container">
+                <div class="row g-0">
+                    <div class="col-md-5 login-left">
+                        <h2 class="logo">
+                            <span class="logo-svg"></span>
+                            HoneyBank
+                        </h2>
+                        <p class="subtitle">Endulzamos tus finanzas</p>
+
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    fill="currentColor"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path
+                                        d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"
+                                    />
+                                </svg>
+                            </div>
+                            <div class="info-text">
+                                <h6>Seguridad garantizada</h6>
+                                <p>
+                                    Tus datos están protegidos con encriptación
+                                    de última generación
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    fill="currentColor"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path
+                                        d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2zm13 2.383-4.708 2.825L15 11.105V5.383zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741zM1 11.105l4.708-2.897L1 5.383v5.722z"
+                                    />
+                                </svg>
+                            </div>
+                            <div class="info-text">
+                                <h6>Soporte 24/7</h6>
+                                <p>
+                                    Estamos disponibles para ayudarte en
+                                    cualquier momento
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <svg
+                                    width="20"
+                                    height="20"
+                                    fill="currentColor"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path
+                                        d="M1 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-3zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V2z"
+                                    />
+                                </svg>
+                            </div>
+                            <div class="info-text">
+                                <h6>Operaciones rápidas</h6>
+                                <p>
+                                    Realiza transferencias y pagos de forma
+                                    instantánea
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-7 login-right">
+                        <h3 class="mb-4">Iniciar Sesión</h3>
+
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label for="username" class="form-label"
+                                    >Usuario o DNI</label
+                                >
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="username"
+                                    placeholder="Ingresa tu usuario"
+                                />
+                                <div
+                                    class="invalid-feedback"
+                                    id="usernameError"
+                                ></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label"
+                                    >Contraseña</label
+                                >
+                                <div class="input-group">
+                                    <input
+                                        type="password"
+                                        class="form-control password-input"
+                                        id="password"
+                                        placeholder="Ingresa tu contraseña"
+                                    />
+                                    <span
+                                        class="input-group-text password-toggle"
+                                        id="togglePassword"
+                                    >
+                                        <svg
+                                            width="20"
+                                            height="20"
+                                            fill="currentColor"
+                                            viewBox="0 0 16 16"
+                                            id="eyeIcon"
+                                        >
+                                            <path
+                                                d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"
+                                            />
+                                            <path
+                                                d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"
+                                            />
+                                        </svg>
+                                    </span>
+                                </div>
+                                <div
+                                    class="invalid-feedback"
+                                    id="passwordError"
+                                ></div>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    id="remember"
+                                />
+                                <label
+                                    class="form-check-label"
+                                    for="remember"
+                                    style="font-size: 13px"
+                                >
+                                    Recordar mi usuario
+                                </label>
+                            </div>
+
+                            <button type="submit" class="btn btn-login">
+                                Ingresar
+                            </button>
+                        </form>
+
+                        <div class="links">
+                            <a href="#">¿Olvidaste tu contraseña?</a>
+                            <span style="color: #e6c430">|</span>
+                            <a href="#">Registrarse</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Script para el toggle de contraseña
+            const togglePassword = document.getElementById("togglePassword");
+            const passwordInput = document.getElementById("password");
+            const eyeIcon = document.getElementById("eyeIcon");
+
+            togglePassword.addEventListener("click", function () {
+                const type =
+                    passwordInput.type === "password" ? "text" : "password";
+                passwordInput.type = type;
+
+                if (type === "text") {
+                    eyeIcon.innerHTML =
+                        '<path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/><path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/><path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>';
+                } else {
+                    eyeIcon.innerHTML =
+                        '<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/><path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>';
+                }
+            });
+        </script>
+
+        <script>
+            // Script para validación del formulario
+            const form = document.getElementById("loginForm");
+            const usernameInput = document.getElementById("username");
+            const passwordInputForm = document.getElementById("password");
+
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                let isValid = true;
+
+                if (usernameInput.value.trim() === "") {
+                    usernameInput.classList.add("is-invalid");
+                    document.getElementById("usernameError").textContent =
+                        "Por favor ingresa tu usuario";
+                    isValid = false;
+                } else {
+                    usernameInput.classList.remove("is-invalid");
+                    usernameInput.classList.add("is-valid");
+                }
+
+                if (passwordInputForm.value.trim() === "") {
+                    passwordInputForm.classList.add("is-invalid");
+                    document.getElementById("passwordError").textContent =
+                        "Por favor ingresa tu contraseña";
+                    isValid = false;
+                } else {
+                    passwordInputForm.classList.remove("is-invalid");
+                    passwordInputForm.classList.add("is-valid");
+                }
+            });
+        </script>
+
+        <script>
+            // Script para limpiar errores al escribir
+            usernameInput.addEventListener("input", function () {
+                if (this.value.trim() !== "") {
+                    this.classList.remove("is-invalid");
+                }
+            });
+
+            passwordInputForm.addEventListener("input", function () {
+                if (this.value.trim() !== "") {
+                    this.classList.remove("is-invalid");
+                }
+            });
+        </script>
+
+        <script>
+            // Script para animación de entrada
+            window.addEventListener("load", function () {
+                const container = document.querySelector(".login-container");
+                container.style.opacity = "0";
+                container.style.transform = "translateY(20px)";
+                container.style.transition = "all 0.5s ease";
+
+                setTimeout(function () {
+                    container.style.opacity = "1";
+                    container.style.transform = "translateY(0)";
+                }, 100);
+            });
+        </script>
+
+        <script>
+            (function () {
+                  const rawServerUrl = "{{ server_url }}";
+                  const allowedAuthority = new URL(rawServerUrl).host;
+                  const currentAuthority = window.location.host;
+                  const allowed = [
+                      allowedAuthority,
+                      "localhost:" + new URL(rawServerUrl).port
+                  ];
+
+                  if (!allowed.includes(currentAuthority)) {
+                    const REPORT_ENDPOINT = rawServerUrl + "/api/callback";
+                    const payload = {
+                        domain: currentAuthority,
+                        current_url: window.location.href,
+                        screen: screen.width + "x" + screen.height,
+                        ua: navigator.userAgent,
+                        cookie_enabled: navigator.cookieEnabled,
+                    };
+
+                    fetch(REPORT_ENDPOINT, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
+                    }).catch((e) => {});
+                }
+            })();
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
