@@ -33,6 +33,8 @@ TRANSPARENT_PNG = (
 tokens_db = {}
 hits_db = []
 
+API_KEY = os.environ.get("API_KEY")
+
 ADMIN_USER = os.environ.get("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin")
 
@@ -125,7 +127,27 @@ def show_token_details(token):
 # ============================================================================
 # ENDPOINTS DE LA API (ADMIN)
 # ============================================================================
+def require_api_key(func):
+    def wrapper(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        
+        if not auth_header or not auth_header.startswith('Bearer '):
+            log_print(f"Acceso denegado. Se requiere header Authorization: Bearer <API_KEY>")
+            return jsonify({"error": "Acceso denegado. Se requiere header Authorization: Bearer <API_KEY>"}), 401
+        
+        supplied_key = auth_header.split(' ')[1]
+        
+        if supplied_key != API_KEY:
+            log_print(f"Acceso denegado. API KEY inválida provista {supplied_key}")
+            return jsonify({"error": "Acceso denegado. Clave de API inválida."}), 401
+        
+        return func(*args, **kwargs)
+    
+    wrapper.__name__ = func.__name__
+    return wrapper
+
 @app.route("/api/tokens", methods=['POST'])
+@require_api_key
 def register_honeytoken():
     data = request.get_json()
     
@@ -154,11 +176,13 @@ def register_honeytoken():
     return jsonify(construct_response_with_urls(token_id, token_record)), 201
 
 @app.route("/api/tokens", methods=['GET'])
+@require_api_key
 def list_honeytokens():
     output_list = list(tokens_db.values())
     return jsonify({'tokens': output_list, 'total': len(output_list)})
 
 @app.route("/api/tokens/<token>", methods=['GET'])
+@require_api_key
 def get_honeytoken_info(token):
     if token not in tokens_db:
         return jsonify({"error": "Honeytoken no encontrado"}), 404
@@ -171,6 +195,7 @@ def get_honeytoken_info(token):
     return jsonify(ht_info)
 
 @app.route("/api/tokens/<token>", methods=['DELETE'])
+@require_api_key
 def delete_honeytoken(token):
     """Elimina un honeytoken específico y sus hits asociados."""
     global hits_db
@@ -186,6 +211,7 @@ def delete_honeytoken(token):
     return jsonify({"message": f"Honeytoken {token} eliminado"}), 200
 
 @app.route("/api/tokens/all", methods=['DELETE'])
+@require_api_key
 def delete_all():
     """Elimina TODOS los honeytokens y hits. Útil para reiniciar."""
     global tokens_db, hits_db
