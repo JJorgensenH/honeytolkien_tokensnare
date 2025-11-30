@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalles del Token: {{ token_data.token }}</title>
+    <style>
+        /* Basic Styling (Copy from tokens_index.html for consistency) */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .detail-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .detail-header {
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .detail-header h1 {
+            margin: 0;
+            color: #007bff;
+            font-size: 1.8em;
+        }
+        .detail-info p {
+            margin: 8px 0;
+            font-size: 1em;
+        }
+        .detail-info strong {
+            display: inline-block;
+            width: 120px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #eee;
+            padding: 10px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+        .hit-count {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #dc3545;
+        }
+        .code-block {
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" style="font-size: 0.9em;">&larr; Volver al Dashboard</a>
+        
+        <div class="detail-card">
+            <div class="detail-header">
+                <h1>Detalles del Honeytoken: <code>{{ token_data.token }}</code></h1>
+            </div>
+
+            <div class="detail-info">
+                <p><strong>Tipo:</strong> {{ token_data.type }}</p>
+                <p><strong>Descripción:</strong> {{ token_data.description }}</p>
+                <p><strong>Hits Totales:</strong> <span class="hit-count">{{ token_data.hits }}</span></p>
+                <p><strong>Creado en:</strong> {{ token_data.created_at.split('T')[0] }} a las {{ token_data.created_at.split('T')[1].split('.')[0] }}</p>
+                {% if token_data.last_hit %}
+                <p><strong>Último Hit:</strong> {{ token_data.last_hit.split('T')[0] }} a las {{ token_data.last_hit.split('T')[1].split('.')[0] }}</p>
+                {% else %}
+                <p><strong>Último Hit:</strong> Nunca</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <h2>Historial de Hits ({{ hit_history|length }})</h2>
+        {% if hit_history %}
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Timestamp</th>
+                    <th>IP</th>
+                    <th>User Agent</th>
+                    <th>Detalles (JSON)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hit in hit_history | reverse %}
+                <tr>
+                    <td>{{ loop.revindex }}</td>
+                    <td>{{ hit.timestamp.split('T')[0] }} {{ hit.timestamp.split('T')[1].split('.')[0] }}</td>
+                    <td>{{ hit.ip }}</td>
+                    <td style="max-width: 300px; overflow-x: auto;">{{ hit.user_agent }}</td>
+                    <td>
+                        <a href="#hit-{{ loop.index }}" onclick="document.getElementById('full-headers-{{ loop.index }}').style.display = (document.getElementById('full-headers-{{ loop.index }}').style.display === 'none' ? 'block' : 'none'); return false;">Mostrar Headers</a>
+                        <div id="full-headers-{{ loop.index }}" class="code-block" style="display:none; margin-top: 5px;">
+                            <pre>{{ hit.headers | tojson(indent=2) }}</pre>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Este token aún no ha recibido ningún hit.</p>
+        {% endif %}
+
+    </div>
+</body>
+</html>

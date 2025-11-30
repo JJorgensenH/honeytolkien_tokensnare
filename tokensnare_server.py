@@ -1,8 +1,10 @@
 import argparse
-from flask import Flask, Response, request, jsonify
+from flask import Flask, Response, request, jsonify, render_template, send_file
+from flask_httpauth import HTTPBasicAuth
 from datetime import datetime, timezone, timedelta
 import logging
 import json
+import os, textwrap
 import hashlib
 from pathlib import Path
 from urllib.parse import urlparse
@@ -17,6 +19,7 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 app = Flask(__name__)
+auth = HTTPBasicAuth()
 BUENOS_AIRES_TZ = timezone(timedelta(hours=-3))
 
 # pixel transparente 1x1
@@ -30,6 +33,9 @@ TRANSPARENT_PNG = (
 tokens_db = {}
 hits_db = []
 
+ADMIN_USER = os.environ.get("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin")
+
 DB_FILE = Path("tokensnare_db.json")
 
 def load_database():
@@ -39,7 +45,6 @@ def load_database():
             data = json.load(f)
             tokens_db = data.get('tokens', {})
             hits_db = data.get('hits', [])
-
 
 def save_database():
     with open(DB_FILE, 'w') as f:
@@ -77,6 +82,47 @@ def log_print(message):
     print(f"[{timestamp}] {message}")
 
 # ============================================================================
+# RUTAS DE ADMIN PARA VISUALIZACIÓN WEB
+# ============================================================================
+@auth.verify_password
+def verify_password(username, password):
+
+    if username == ADMIN_USER and password == ADMIN_PASSWORD:
+        return username
+    return None
+
+@app.route("/tokens")
+@app.route("/api/tokens", methods=['GET'])
+@auth.login_required
+def honeytokens_index():
+    # In your Flask route:
+    return render_template("tokens_index.html", tokens=tokens_db, hits_list=hits_db)
+
+# Assuming tokens_db and hits_db are available globally
+
+@app.route("/tokens/<token>", methods=['GET'])
+@auth.login_required
+def show_token_details(token):
+    if token not in tokens_db:
+        # If the token is not found, render a simple 404 page (or redirect)
+        return render_template("404.html", error_message=f"Honeytoken '{token}' no encontrado"), 404
+
+    # Get the token's base info
+    ht_info = tokens_db[token].copy()
+    
+    # Filter the global hits_db to get only hits for this token
+    hit_history = [
+        hit for hit in hits_db if hit['token'] == token
+    ]
+
+    # Render the detail template
+    return render_template(
+        "token_detail.html", 
+        token_data=ht_info, 
+        hit_history=hit_history
+    )
+
+# ============================================================================
 # ENDPOINTS DE LA API (ADMIN)
 # ============================================================================
 @app.route("/api/tokens", methods=['POST'])
@@ -107,7 +153,6 @@ def register_honeytoken():
 
     return jsonify(construct_response_with_urls(token_id, token_record)), 201
 
-
 @app.route("/api/tokens", methods=['GET'])
 def list_honeytokens():
     output_list = list(tokens_db.values())
@@ -125,7 +170,6 @@ def get_honeytoken_info(token):
 
     return jsonify(ht_info)
 
-
 @app.route("/api/tokens/<token>", methods=['DELETE'])
 def delete_honeytoken(token):
     """Elimina un honeytoken específico y sus hits asociados."""
@@ -141,7 +185,6 @@ def delete_honeytoken(token):
 
     return jsonify({"message": f"Honeytoken {token} eliminado"}), 200
 
-
 @app.route("/api/tokens/all", methods=['DELETE'])
 def delete_all():
     """Elimina TODOS los honeytokens y hits. Útil para reiniciar."""
@@ -152,7 +195,6 @@ def delete_all():
 
     log_print(f"DB Reset")
     return jsonify({"message": "DB Reset"}), 200
-
 
 # ============================================================================
 # TRACKING
@@ -191,7 +233,6 @@ def _register_hit(token: str):
         log_print(f"ALERTA HIT NO ESPERADO | IP: {ip} | UA: {user_agent}")
     save_database()
 
-
 @app.route("/image/<token>.png", methods=['GET', 'OPTIONS'])
 def image_hit(token):
     """
@@ -203,7 +244,6 @@ def image_hit(token):
         return ('', 204)
     _register_hit(token)
     return Response(TRANSPARENT_PNG, mimetype="image/png")
-
 
 @app.route("/link/<token>", methods=['GET', 'OPTIONS'])
 def link_hit(token):
@@ -218,14 +258,9 @@ def link_hit(token):
     _register_hit(token)
     return ('', 204)
 
-
 @app.route("/", methods=['GET'])
 def index():
-    """Página de información del servidor."""
-    return jsonify(
-        {"service": "TokenSnare", "active_tokens": len(tokens_db), "hits": len(hits_db)}
-    )
-
+    return render_template("home.html", active_tokens=len(tokens_db), hits=len(hits_db))
 
 # ============================================================================
 # Sitio web demo
@@ -235,7 +270,6 @@ def honeybank():
     server_url = request.host_url.rstrip("/")
     return render_template("index.html.j2", server_url=server_url)
 
-
 @app.route("/assets/styles.css")
 def css():
     server_url = request.host_url.rstrip("/")
@@ -243,7 +277,6 @@ def css():
     response = Response(css, mimetype="text/css")
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
-
 
 @app.route("/assets/honey_logo.svg")
 def logo():
@@ -280,7 +313,6 @@ def logo():
 
     return send_file("assets/honey_logo.svg", mimetype="image/svg+xml")
 
-
 @app.route("/api/callback", methods=["POST", "OPTIONS"])
 def js_callback():
     if request.method == "OPTIONS":
@@ -315,7 +347,6 @@ def js_callback():
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
-
 # ============================================================================
 # MAIN
 # ============================================================================
@@ -324,19 +355,19 @@ def main():
     parser = argparse.ArgumentParser(
         description="TokenSnare Alert Server - Servidor de honeytokens",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Endpoints:
-  POST   /api/tokens          - Registrar
-  GET    /api/tokens          - Listar
-  GET    /api/tokens/<token>  - Detalles
-  DELETE /api/tokens/<token>  - Borrar uno
-  DELETE /api/tokens/all      - Borrar todo
-  
-  GET    /image/<token>.png   - Tracking (Imagen)
-  GET    /link/<token>        - Tracking (Link)
+        epilog=textwrap.dedent("""
+            Endpoints:
+            POST   /api/tokens          - Registrar
+            GET    /api/tokens          - Listar
+            GET    /api/tokens/<token>  - Detalles
+            DELETE /api/tokens/<token>  - Borrar uno
+            DELETE /api/tokens/all      - Borrar todo
+            
+            GET    /image/<token>.png   - Tracking (Imagen)
+            GET    /link/<token>        - Tracking (Link)
 
-La base de datos se guarda en: tokensnare_db.json
-        """
+            La base de datos se guarda en: tokensnare_db.json
+        """)
     )
     
     parser.add_argument('--host', default='127.0.0.1',
@@ -358,7 +389,6 @@ La base de datos se guarda en: tokensnare_db.json
     
     # Iniciar servidor
     app.run(host=args.host, port=args.port)
-
 
 if __name__ == "__main__":
     main()
