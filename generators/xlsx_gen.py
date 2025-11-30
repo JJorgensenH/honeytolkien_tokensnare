@@ -10,7 +10,6 @@ CONTENT_TYPES = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <Default Extension="xml" ContentType="application/xml"/>
     <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
     <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
-    <Override PartName="/xl/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>
     <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
     <Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>
     <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
@@ -32,14 +31,15 @@ WORKBOOK = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 WORKBOOK_RELS = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
-  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>
   <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
 </Relationships>"""
 
-WORKSHEET = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+WORKSHEET_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <sheetData><row r="1"><c r="A1" t="s"><v>0</v></c></row></sheetData>
-  <drawing r:id="rId1"/>
+  <sheetData><row r="1"><c r="A1" t="inlineStr">
+  <is><t>{}</t></is>
+</c></row></sheetData>
+<drawing r:id="rId1"/>
 </worksheet>"""
 
 WORKSHEET_RELS = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -72,7 +72,7 @@ CORE_PROPS_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 </cp:coreProperties>"""
 
 
-def generate_xlsx_honeytoken(server_url, output_file, description, title=None, author=None):
+def generate_xlsx_honeytoken(server_url, output_file, description, title=None, author=None, content=None):
     token_data = register_token(
         server_url,
         token_type="xlsx",
@@ -87,7 +87,9 @@ def generate_xlsx_honeytoken(server_url, output_file, description, title=None, a
     
     clean_title = escape(title or "")
     clean_author = escape(author or "")
+    clean_content = escape(content or "")
     
+    worksheet_final = WORKSHEET_TEMPLATE.format(clean_content)
     drawing_rels_final = DRAWING_RELS_TEMPLATE.format(tracking_url)
     
     core_props_final = CORE_PROPS_TEMPLATE.format(
@@ -104,12 +106,12 @@ def generate_xlsx_honeytoken(server_url, output_file, description, title=None, a
         z.writestr('_rels/.rels', RELS_GLOBAL)
         z.writestr('xl/workbook.xml', WORKBOOK)
         z.writestr('xl/_rels/workbook.xml.rels', WORKBOOK_RELS)
-        z.writestr('xl/worksheets/sheet1.xml', WORKSHEET)
         z.writestr('xl/worksheets/_rels/sheet1.xml.rels', WORKSHEET_RELS)
-        z.writestr('xl/theme/theme1.xml', THEME)
+        # z.writestr('xl/theme/theme1.xml', THEME)
         z.writestr('xl/styles.xml', STYLES)
         z.writestr('docProps/app.xml', APP_PROPS)
         # Templates dinámicos
+        z.writestr('xl/worksheets/sheet1.xml', worksheet_final)
         z.writestr('xl/drawings/drawing1.xml', DRAWING)
         z.writestr('xl/drawings/_rels/drawing1.xml.rels', drawing_rels_final)
         z.writestr('docProps/core.xml', core_props_final)   
