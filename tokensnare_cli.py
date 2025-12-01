@@ -6,10 +6,10 @@ Herramienta centralizada para generación de Honeytokens.
 import argparse
 import sys
 from pathlib import Path
-from generators import generate_pdf_honeytoken, generate_epub_honeytoken, generate_xlsx_honeytoken, generate_docx_honeytoken
+from generators import generate_pdf_honeytoken, generate_epub_honeytoken, generate_xlsx_honeytoken, generate_docx_honeytoken, generate_qrcode_honeytoken
 
 OUTPUT_FOLDER_NAME = "honeyTokens"
-FILE_TYPE_SUPPORTED = ['pdf', 'epub', 'xlsx', 'docx']
+FILE_TYPE_SUPPORTED = ['pdf', 'epub', 'xlsx', 'docx', 'qrcode']
 
 def get_output_path(filename):
     folder = Path(OUTPUT_FOLDER_NAME)
@@ -84,6 +84,12 @@ def main():
                 title=args.title,
                 author=args.author,
                 content=args.content
+            )
+        case 'qrcode':
+            generate_qrcode_honeytoken(
+                server_url=args.server,
+                output_file=final_output_path,
+                description=args.description,
             )
         case _:
             print("Tipo no reconocido")
