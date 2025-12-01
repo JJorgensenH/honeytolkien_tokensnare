@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TokenSnare Dashboard</title>
+    <style>
+        /* Basic Styling for readability - You can replace this with Bootstrap later */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .token-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .token-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .token-header h3 {
+            margin: 0;
+            color: #007bff;
+        }
+        .hit-count {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #dc3545;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #eee;
+            padding: 8px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        th {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+        .hit-table-header {
+            color: #6c757d;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+        .token-info p {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+        /* ... (Estilos existentes) ... */
+
+        /* Resetear el enlace contenedor */
+        .token-link {
+            text-decoration: none; /* Quita el subrayado del enlace */
+            color: inherit; /* Hereda el color del texto para que no sea azul */
+            display: block; /* Hace que el enlace ocupe todo el ancho */
+            margin-bottom: 20px; /* Separación entre tarjetas */
+        }
+
+        /* Efecto al pasar el mouse para la tarjeta */
+        .token-card {
+            /* Propiedades de tarjeta existentes */
+            transition: transform 0.2s, box-shadow 0.2s; /* Transición suave */
+            cursor: pointer; /* Cambia el cursor para indicar que es clickeable */
+        }
+
+        .token-link:hover .token-card {
+            transform: translateY(-3px); /* Pequeño efecto 3D */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Sombra más oscura */
+            border-color: #007bff; /* Resalta con el color principal */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" style="font-size: 0.9em;">&larr; Volver al Dashboard</a>
+
+        <h1>TokenSnare Honeytoken Dashboard</h1>
+        <p>Mostrando {{ tokens|length }} token(s) activo(s) y {{ hits_list|length }} hit(s) totales.</p>
+        
+        {% for token_id, token_data in tokens.items() %}
+        <a href="{{ url_for('show_token_details', token=token_id) }}" class="token-link">
+            <div class="token-card">
+                
+                <div class="token-header">
+                    <h3>Token: {{ token_id }}</h3>
+                    <span class="hit-count">{{ token_data.hits }} Hits</span>
+                </div>
+
+                <div class="token-info">
+                    <p><strong>Tipo:</strong> {{ token_data.type }}</p>
+                    <p><strong>Descripción:</strong> {{ token_data.description }}</p>
+                    <p><strong>Creado:</strong> {{ token_data.created_at.split('T')[0] }} a las {{ token_data.created_at.split('T')[1].split('.')[0] }}</p>
+                    {% if token_data.last_hit %}
+                    <p><strong>Último Hit:</strong> {{ token_data.last_hit.split('T')[0] }} a las {{ token_data.last_hit.split('T')[1].split('.')[0] }}</p>
+                    {% else %}
+                    <p><strong>Último Hit:</strong> Nunca</p>
+                    {% endif %}
+                </div>
+
+            </div>
+        </a>
+        {% endfor %}
+
+    </div>
+</body>
+</html>

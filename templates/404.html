@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Error 404 - No Encontrado</title>
+    <style>
+        /* Basic Styling copied from your other templates */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            text-align: center;
+        }
+        .error-container {
+            max-width: 600px;
+            margin: 100px auto;
+            background-color: #fff;
+            border: 1px solid #dc3545; /* Red border for error */
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .error-container h1 {
+            color: #dc3545;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .error-container p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>Error 404</h1>
+        <p>{{ error_message }}</p> 
+        <a href="/" class="back-link">&larr; Volver al Dashboard</a>
+    </div>
+</body>
+</html>

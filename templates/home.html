@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>HoneyTolkien - Servidor de Alertas</title>
+    <style>
+        /* Estilos básicos para consistencia */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        h1 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        /* Estilo de tarjeta de resumen */
+        .summary-card {
+            display: flex;
+            justify-content: space-around;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .summary-item {
+            text-align: center;
+        }
+        .summary-item .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #dc3545; /* Rojo para alertas/hits */
+            display: block;
+        }
+        .summary-item .label {
+            color: #6c757d;
+            font-size: 1em;
+        }
+        /* Estilo de Endpoints */
+        .endpoint-section {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .endpoint-section h2, .endpoint-section h3 {
+            color: #495057;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .endpoint-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .endpoint-section li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #f1f1f1;
+        }
+        .endpoint-section li:last-child {
+            border-bottom: none;
+        }
+        .endpoint-section strong {
+            display: inline-block;
+            width: 80px; /* Ancho fijo para alinear el método */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HoneyTolkien - Servidor de Alertas</h1>
+        <p>Este servidor web simple se utiliza para recibir los "call home" de los honeytokens generados por la herramienta <code>tokensnare-cli</code> desarrollada para el TP de la materia de Seguridad de Información por el equipo HoneyTolkien.</p>
+
+        <div class="summary-card">
+            <div class="summary-item">
+                <span class="value">{{ active_tokens }}</span>
+                <span class="label">Tokens Activos</span>
+            </div>
+            <div class="summary-item">
+                <span class="value">{{ hits }}</span>
+                <span class="label">Hits Totales Recibidos</span>
+            </div>
+        </div>
+        
+        <div class="endpoint-section">
+            <h3>Rutas de la Interfaz Web:</h3>
+            <ul>
+                <li>
+                    <strong><span style="color: #28a745;">GET</span></strong> 
+                    <a href="/">/</a> — Página de inicio (esta página) que muestra el total de tokens y hits.
+                </li>
+                <li>
+                    <strong><span style="color: #28a745;">GET</span></strong> 
+                    <a href="/tokens">/tokens</a> — Lista de los tokens registrados con un pequeño resumen de info de cada uno.
+                </li>
+                <li>
+                    <strong><span style="color: #28a745;">GET</span></strong> 
+                    <a href="/tokens/cc06566ad6c13520">/tokens/&lt;token_id&gt;</a> — Detalles de un token especifico.
+                </li>
+                <li>
+                    <strong><span style="color: #28a745;">GET</span></strong> 
+                    <a href="/website_demo">/website_demo</a> — Sitio web de demostración (HoneyBank) para testing de honeytokens de clonación.
+                </li>
+            </ul>
+        </div>
+
+        <div class="endpoint-section">
+            <h2>Endpoints de la API (Administración):</h2>
+            <ul>
+                <li>
+                    <strong><span style="color: #007bff;">POST</span></strong> /api/tokens — Registrar un nuevo honeytoken. (JSON Req.)
+                </li>
+                <li>
+                    <strong><span style="color: #28a745;">GET</span></strong> <a href="/api/tokens" target="_blank">/api/tokens</a> — Listar todos los honeytokens registrados. (JSON Resp.)
+                </li>
+                <li>
+                    <strong><span style="color: #28a745;">GET</span></strong> /api/tokens/&lt;token&gt; — Mostrar detalles, logs, e historial de hits de un token específico.
+                </li>
+                <li>
+                    <strong><span style="color: #dc3545;">DELETE</span></strong> /api/tokens/&lt;token&gt; — Eliminar un honeytoken específico y sus hits asociados.
+                </li>
+                <li>
+                    <strong><span style="color: #dc3545;">DELETE</span></strong> /api/tokens/all — Eliminar todos los tokens y hits (reseteo de la base de datos).
+                </li>
+                <li>
+                    <strong><span style="color: #000000;">OPTIONS</span></strong> /api/callback — CORS preflight para reportes de clonación por JS.
+                </li>
+                <li>
+                    <strong><span style="color: #007bff;">POST</span></strong> /api/callback — Recibir reporte de sitio web clonado (JS).
+                </li>
+            </ul>
+        </div>
+        
+        <div class="endpoint-section">
+            <h3>Endpoints de Tracking (Honeytokens):</h3>
+            <ul>
+                <li>
+                    <strong><span style="color: #28a745;">GET</span></strong> /image/&lt;token&gt;.png — Imagen 1x1 PNG transparente usada como beacon para rastreo.
+                </li>
+                <li>
+                    <strong><span style="color: #28a745;">GET</span></strong> /link/&lt;token&gt; — Endpoint de rastreo tipo enlace. Registra hit y retorna 204 No Content.
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

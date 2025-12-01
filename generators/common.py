@@ -2,8 +2,8 @@ import requests
 import sys
 from random import randint
 from datetime import datetime, timezone, timedelta
-
-
+import os
+from dotenv import load_dotenv
 
 def register_token(server_url, token_type, description, metadata=None):
     """
@@ -15,6 +15,12 @@ def register_token(server_url, token_type, description, metadata=None):
         server_url = f"http://{server_url}"
     
     api_url = f"{server_url.rstrip('/')}/api/tokens"
+
+    load_dotenv()
+    api_key = os.environ.get("API_KEY", None)
+    headers = {}
+    if api_key:
+        headers['Authorization'] = f'Bearer {api_key}'
     
     payload = {
         "type": token_type,
@@ -23,7 +29,7 @@ def register_token(server_url, token_type, description, metadata=None):
     }
     
     try:
-        response = requests.post(api_url, json=payload, timeout=5)
+        response = requests.post(api_url, json=payload, headers=headers, timeout=5)
         response.raise_for_status()
         return response.json()
     except requests.exceptions.RequestException as e:
