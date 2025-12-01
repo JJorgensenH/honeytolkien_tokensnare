@@ -73,7 +73,8 @@ def main():
                 output_file=final_output_path,
                 description=args.description,
                 title=args.title,
-                author=args.author
+                author=args.author,
+                content=args.content
             )
         case 'docx':
             generate_docx_honeytoken(
