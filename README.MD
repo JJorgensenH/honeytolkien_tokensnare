@@ -21,6 +21,14 @@ Para detener el servidor, utilizar Ctrl+C o:
 docker compose down
 ```
 
+Para el HoneyToken binario se incluyen los templates de linux y windows por comodidad, 
+pero se pueden regenerar con docker sin necesidad de instalar Go a partir del stub.go utilizando los comandos:
+```bash
+docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp -e GOOS=windows -e GOARCH=amd64 golang:alpine go build -ldflags "-H=windowsgui -s -w" -o template_win.exe stub.go
+
+docker run --rm -v "$PWD":/usr/src/myapp -w /usr/src/myapp -e GOOS=linux -e GOARCH=amd64 golang:alpine go build -ldflags "-s -w" -o template_linux stub.go
+```
+
 # Modo "manual"
 ## Server
 ` python3 tokensnare_server.py --host $ip --port 5000 `

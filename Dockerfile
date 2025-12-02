@@ -10,9 +10,11 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-COPY generators generators
-COPY assets assets
 COPY templates templates
+COPY assets assets
+COPY generators generators
+COPY binary_template/template_linux binary_template/template_linux
+COPY binary_template/template_win.exe binary_template/template_win.exe
 COPY tokensnare_cli.py .
 COPY tokensnare_server.py .
 
