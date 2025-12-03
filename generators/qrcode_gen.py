@@ -2,9 +2,6 @@ from .common import register_token
 import qrcode
 
 def generate_qrcode_honeytoken(server_url, output_file, description):
-    """
-    Genera un PDF con OpenAction hacia una URI.
-    """    
     token_data = register_token(
         server_url, 
         token_type="qrcode",
