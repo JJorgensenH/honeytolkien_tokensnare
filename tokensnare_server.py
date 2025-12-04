@@ -262,18 +262,18 @@ def _register_hit(token: str):
         'headers': dict(request.headers)
     }
     
-    hits_db.append(hit_record)
-
     # Alerta
     if token in tokens_db:
+        hits_db.append(hit_record)
+
         tokens_db[token]['hits'] += 1
         tokens_db[token]['last_hit'] = ts_iso
         token_type = tokens_db[token]['type']
         description = tokens_db[token]['description']
         log_print(f"ALERTA HIT | ID: {token} | Tipo: {token_type} | Descripción: {description} | IP: {ip} | UA: {user_agent}")
 
-    else:
-        log_print(f"ALERTA HIT NO ESPERADO | IP: {ip} | UA: {user_agent}")
+    # else:
+    #     log_print(f"ALERTA HIT NO ESPERADO | IP: {ip} | UA: {user_agent}")
     save_database()
 
 @app.route("/image/<token>.png", methods=['GET', 'OPTIONS'])
